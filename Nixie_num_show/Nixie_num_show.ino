@@ -6,7 +6,7 @@
 //
 // Designed for use with tlc5947's controlling nixie tubes. 
 //
-#include "Tlc5940.h"
+#include "Tlc5947.h"
 
 #define DAYVAL 3000 // max on brightness of tubes.
 #define NIGHTVAL 800 // Optional value that the digits run at over night.

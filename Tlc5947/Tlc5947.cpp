@@ -1,29 +1,29 @@
 /*  Copyright (c) 2009 by Alex Leone <acleone ~AT~ gmail.com>
 
-    This file is part of the Arduino TLC5940 Library.
+    This file is part of the Arduino TLC5947 Library.
 
-    The Arduino TLC5940 Library is free software: you can redistribute it
+    The Arduino TLC5947 Library is free software: you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
     published by the Free Software Foundation, either version 3 of the
     License, or (at your option) any later version.
 
-    The Arduino TLC5940 Library is distributed in the hope that it will be
+    The Arduino TLC5947 Library is distributed in the hope that it will be
     useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with The Arduino TLC5940 Library.  If not, see
+    along with The Arduino TLC5947 Library.  If not, see
     <http://www.gnu.org/licenses/>. */
 
 /** \file
-    Tlc5940 class functions. */
+    Tlc5947 class functions. */
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
 #include "tlc_config.h"
-#include "Tlc5940.h"
+#include "Tlc5947.h"
 
 /** Pulses a pin - high then low. */
 #define pulse_pin(port, pin)   port |= _BV(pin); port &= ~_BV(pin)
@@ -89,7 +89,7 @@ ISR(TIMER1_OVF_vect)
     zeros, or whatever initialValue is set to and the Timers will start.
     \param initialValue = 0, optional parameter specifing the inital startup
            value */
-void Tlc5940::init(uint16_t initialValue)
+void Tlc5947::init(uint16_t initialValue)
 {
     /* Pin Setup */
     XLAT_DDR |= _BV(XLAT_PIN);
@@ -156,7 +156,7 @@ void Tlc5940::init(uint16_t initialValue)
 /** Clears the grayscale data array, #tlc_GSData, but does not shift in any
     data.  This call should be followed by update() if you are turning off
     all the outputs. */
-void Tlc5940::clear(void)
+void Tlc5947::clear(void)
 {
     setAll(0);
 }
@@ -170,7 +170,7 @@ void Tlc5940::clear(void)
     \code while(tlc_needXLAT); \endcode
     \returns 1 if there is data waiting to be latched, 0 if data was
              successfully shifted in */
-uint8_t Tlc5940::update(void)
+uint8_t Tlc5947::update(void)
 {
     if (tlc_needXLAT) {
         return 1;
@@ -199,7 +199,7 @@ uint8_t Tlc5940::update(void)
            channel 0, OUT0 of the next TLC is channel 16, etc.
     \param value (0-4095).  The grayscale value, 4095 is maximum.
     \see get */
-void Tlc5940::set(TLC_CHANNEL_TYPE channel, uint16_t value)
+void Tlc5947::set(TLC_CHANNEL_TYPE channel, uint16_t value)
 {
     TLC_CHANNEL_TYPE index8 = (NUM_TLCS * 24 - 1) - channel;
     uint8_t *index12p = tlc_GSData + ((((uint16_t)index8) * 3) >> 1);
@@ -221,7 +221,7 @@ void Tlc5940::set(TLC_CHANNEL_TYPE channel, uint16_t value)
            channel 0, OUT0 of the next TLC is channel 16, etc.
     \returns current grayscale value (0 - 4095) for channel
     \see set */
-uint16_t Tlc5940::get(TLC_CHANNEL_TYPE channel)
+uint16_t Tlc5947::get(TLC_CHANNEL_TYPE channel)
 {
     TLC_CHANNEL_TYPE index8 = (NUM_TLCS * 24 - 1) - channel;
     uint8_t *index12p = tlc_GSData + ((((uint16_t)index8) * 3) >> 1);
@@ -236,7 +236,7 @@ uint16_t Tlc5940::get(TLC_CHANNEL_TYPE channel)
 
 /** Sets all channels to value.
     \param value grayscale value (0 - 4095) */
-void Tlc5940::setAll(uint16_t value)
+void Tlc5947::setAll(uint16_t value)
 {
     uint8_t firstByte = value >> 4;
     uint8_t secondByte = (value << 4) | (value >> 8);
@@ -252,7 +252,7 @@ void Tlc5940::setAll(uint16_t value)
 
 /** \addtogroup ReqVPRG_ENABLED
     From the \ref CoreFunctions "Core Functions":
-    - \link Tlc5940::setAllDC Tlc.setAllDC(uint8_t value(0-63)) \endlink - sets
+    - \link Tlc5947::setAllDC Tlc.setAllDC(uint8_t value(0-63)) \endlink - sets
       all the dot correction data to value */
 /* @{ */
 
@@ -264,7 +264,7 @@ void Tlc5940::setAll(uint16_t value)
          \frac{39.06}{R_{IREF}} \f$
     - DCn is the dot correction value for channel n
     \param value (0-63) */
-void Tlc5940::setAllDC(uint8_t value)
+void Tlc5947::setAllDC(uint8_t value)
 {
     tlc_dcModeStart();
 
@@ -290,7 +290,7 @@ void Tlc5940::setAllDC(uint8_t value)
 
 /** Checks for shorted/broken LEDs reported by any of the TLCs.
     \returns 1 if a TLC is reporting an error, 0 otherwise. */
-uint8_t Tlc5940::readXERR(void)
+uint8_t Tlc5947::readXERR(void)
 {
     return ((XERR_PINS & _BV(XERR_PIN)) == 0);
 }
@@ -369,21 +369,21 @@ void tlc_dcModeStop(void)
 #endif
 
 /** Preinstantiated Tlc variable. */
-Tlc5940 Tlc;
+Tlc5947 Tlc;
 
 /** \defgroup ExtendedFunctions Extended Library Functions
     These functions require an include statement at the top of the sketch. */
 /* @{ */ /* @} */
 
 /** \mainpage
-    The <a href="http://www.ti.com/lit/gpn/TLC5940">Texas Instruments TLC5940
+    The <a href="http://www.ti.com/lit/gpn/TLC5947">Texas Instruments TLC5947
     </a> is a 16-channel, constant-current sink LED driver.  Each channel has
     an individually adjustable 4096-step grayscale PWM brightness control and
     a 64-step, constant-current sink (no LED resistors needed!).  This chip
     is a current sink, so be sure to use common anode RGB LEDs.
 
-    Check the <a href="http://code.google.com/p/tlc5940arduino/">tlc5940arduino
-    project</a> on Google Code for updates.  To install, unzip the "Tlc5940"
+    Check the <a href="http://code.google.com/p/tlc5947arduino/">tlc5947arduino
+    project</a> on Google Code for updates.  To install, unzip the "Tlc5947"
     folder to &lt;Arduino Folder&gt;/hardware/libraries/
 
     &nbsp;
@@ -391,30 +391,30 @@ Tlc5940 Tlc;
     \section hardwaresetup Hardware Setup
     The basic hardware setup is explained at the top of the Examples.  A good
     place to start would be the BasicUse Example.  (The examples are in
-    File->Sketchbook->Examples->Library-Tlc5940).
+    File->Sketchbook->Examples->Library-Tlc5947).
 
     All the options for the library are located in tlc_config.h, including
     #NUM_TLCS, what pins to use, and the PWM period.  After changing
-    tlc_config.h, be sure to delete the Tlc5940.o file in the library folder
+    tlc_config.h, be sure to delete the Tlc5947.o file in the library folder
     to save the changes.
 
     &nbsp;
 
     \section libref Library Reference
-    \ref CoreFunctions "Core Functions" (see the BasicUse Example and Tlc5940):
-    - \link Tlc5940::init Tlc.init(int initialValue (0-4095))\endlink - Call this is
+    \ref CoreFunctions "Core Functions" (see the BasicUse Example and Tlc5947):
+    - \link Tlc5947::init Tlc.init(int initialValue (0-4095))\endlink - Call this is
             to setup the timers before using any other Tlc functions.
             initialValue defaults to zero (all channels off).
-    - \link Tlc5940::clear Tlc.clear()\endlink - Turns off all channels
+    - \link Tlc5947::clear Tlc.clear()\endlink - Turns off all channels
             (Needs Tlc.update())
-    - \link Tlc5940::set Tlc.set(uint8_t channel (0-(NUM_TLCS * 16 - 1)),
+    - \link Tlc5947::set Tlc.set(uint8_t channel (0-(NUM_TLCS * 16 - 1)),
             int value (0-4095))\endlink - sets the grayscale data for channel.
             (Needs Tlc.update())
-    - \link Tlc5940::setAll Tlc.setAll(int value(0-4095))\endlink - sets all
+    - \link Tlc5947::setAll Tlc.setAll(int value(0-4095))\endlink - sets all
             channels to value. (Needs Tlc.update())
-    - \link Tlc5940::get uint16_t Tlc.get(uint8_t channel)\endlink - returns
+    - \link Tlc5947::get uint16_t Tlc.get(uint8_t channel)\endlink - returns
             the grayscale data for channel (see set).
-    - \link Tlc5940::update Tlc.update()\endlink - Sends the changes from any
+    - \link Tlc5947::update Tlc.update()\endlink - Sends the changes from any
             Tlc.clear's, Tlc.set's, or Tlc.setAll's.
 
     \ref ExtendedFunctions "Extended Functions".  These require an include
@@ -437,7 +437,7 @@ Tlc5940 Tlc;
 #define TLC_MY_CRAZY_FUNCTIONS_H
 
 #include "tlc_config.h"
-#include "Tlc5940.h"
+#include "Tlc5947.h"
 
 void tlc_goCrazy(void);
 
@@ -476,19 +476,19 @@ tlc_goCrazy();
     \section license License - GPLv3
     Copyright (c) 2009 by Alex Leone <acleone ~AT~ gmail.com>
 
-    This file is part of the Arduino TLC5940 Library.
+    This file is part of the Arduino TLC5947 Library.
 
-    The Arduino TLC5940 Library is free software: you can redistribute it
+    The Arduino TLC5947 Library is free software: you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
     published by the Free Software Foundation, either version 3 of the
     License, or (at your option) any later version.
 
-    The Arduino TLC5940 Library is distributed in the hope that it will be
+    The Arduino TLC5947 Library is distributed in the hope that it will be
     useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with The Arduino TLC5940 Library.  If not, see
+    along with The Arduino TLC5947 Library.  If not, see
     <http://www.gnu.org/licenses/>. */
 
