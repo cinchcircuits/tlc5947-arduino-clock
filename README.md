@@ -5,7 +5,7 @@ tlc5947-arduino-clock
 
 Nixe_num_show
 =============
-
+A simple example that just scrolls number across 4 Nixie Tubes.
 
 Tlc5947
 =======
