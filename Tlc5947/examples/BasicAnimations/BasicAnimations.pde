@@ -15,7 +15,7 @@
 
     Alex Leone <acleone ~AT~ gmail.com>, 2009-02-03 */
 
-#include "Tlc5940.h"
+#include "Tlc5947.h"
 #include "tlc_animations.h"
 #include "ani_arduino.h"
 
