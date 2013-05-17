@@ -1,5 +1,8 @@
+2013-05-16
+    - Changing all links of tlc5940.h to tlc5947.h
+
 2013-05-09
-    - Modifying sothe library talks to the tlc5947 instead.
+    - Modifying some of the library talks to the tlc5947 instead.
 
 2009-05-07
     - Added support for the Arduino Mega
